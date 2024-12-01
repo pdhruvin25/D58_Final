@@ -1,4 +1,5 @@
 import argparse
+import threading
 import platform
 from src.sniffer import Sniffer
 from src.raw_socket_sniffer import RawSocketSniffer
@@ -26,7 +27,60 @@ def main():
             sniffer = RawSocketSniffer(filter_rule=args.filter)
 
     display.show_banner()
-    sniffer.start(display.process_packet)
+
+    # Create events for controlling the sniffer
+    pause_event = threading.Event()
+    stop_event = threading.Event()
+    pause_event.clear()
+    stop_event.clear()
+
+    try:
+        # Start the sniffer in a separate thread
+        sniffer_thread = threading.Thread(target=sniffer.start, args=(display.process_packet, pause_event, stop_event))
+        sniffer_thread.start()
+
+        # Start a thread to handle user input
+        input_thread = threading.Thread(target=handle_user_input, args=(pause_event, stop_event))
+        input_thread.start()
+
+        # Keep the main thread alive while other threads are running
+        while sniffer_thread.is_alive() and input_thread.is_alive():
+            sniffer_thread.join(timeout=1)
+            input_thread.join(timeout=1)
+
+    except KeyboardInterrupt:
+        print("\n[INFO] KeyboardInterrupt detected. Stopping sniffer...")
+        stop_event.set()
+        pause_event.set()  # In case it's waiting on pause_event
+        sniffer.stop()     # Call a stop method if necessary
+    finally:
+        sniffer_thread.join()
+        input_thread.join()
+        print("[INFO] Sniffer stopped.")
+
+def handle_user_input(pause_event, stop_event):
+    print("[INFO] Press 'p' to pause, 'r' to resume, 'q' to quit.")
+    while not stop_event.is_set():
+        try:
+            user_input = input()
+            if user_input.lower() == 'p':
+                if not pause_event.is_set():
+                    pause_event.set()
+                    print("[INFO] Sniffer paused.")
+            elif user_input.lower() == 'r':
+                if pause_event.is_set():
+                    pause_event.clear()
+                    print("[INFO] Sniffer resumed.")
+            elif user_input.lower() == 'q':
+                stop_event.set()
+                print("[INFO] Stopping sniffer...")
+                break
+            else:
+                print("[INFO] Invalid input. Press 'p' to pause, 'r' to resume, 'q' to quit.")
+        except EOFError:
+            # Handle end of input (e.g., when input stream is closed)
+            stop_event.set()
+            break
 
 if __name__ == "__main__":
     main()
