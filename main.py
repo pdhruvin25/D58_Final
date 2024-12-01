@@ -1,4 +1,5 @@
 import argparse
+import platform
 from src.sniffer import Sniffer
 from src.raw_socket_sniffer import RawSocketSniffer
 from src.display import Display
@@ -13,10 +14,16 @@ def main():
 
     display = Display()
 
-    if args.mode == 'scapy':
+    os_type = platform.system().lower()
+    if os_type == 'windows':
+        if args.mode == 'raw':
+            print("[WARNING] Raw socket mode is not supported on Windows. Switching to Scapy mode.")
         sniffer = Sniffer(filter_rule=args.filter)
     else:
-        sniffer = RawSocketSniffer(filter_rule=args.filter)
+        if args.mode == 'scapy':
+            sniffer = Sniffer(filter_rule=args.filter)
+        else:
+            sniffer = RawSocketSniffer(filter_rule=args.filter)
 
     display.show_banner()
     sniffer.start(display.process_packet)
