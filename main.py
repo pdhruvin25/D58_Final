@@ -37,15 +37,11 @@ def main():
     stop_event.clear()
 
     try:
-        # Start the sniffer in a separate thread
         sniffer_thread = threading.Thread(target=sniffer.start, args=(display.process_packet, pause_event, stop_event))
         sniffer_thread.start()
-
-        # Start a thread to handle user input
         input_thread = threading.Thread(target=handle_user_input, args=(pause_event, stop_event))
         input_thread.start()
 
-        # Keep the main thread alive while other threads are running
         while sniffer_thread.is_alive() and input_thread.is_alive():
             sniffer_thread.join(timeout=1)
             input_thread.join(timeout=1)
@@ -53,11 +49,12 @@ def main():
     except KeyboardInterrupt:
         print("\n[INFO] KeyboardInterrupt detected. Stopping sniffer...")
         stop_event.set()
-        pause_event.set()  # In case it's waiting on pause_event
-        sniffer.stop()     # Call a stop method if necessary
+        pause_event.set()
+        sniffer.stop()
     finally:
         sniffer_thread.join()
         input_thread.join()
+        display.show_statistics(sniffer.packet_stats)
         print("[INFO] Sniffer stopped.")
 
 def handle_user_input(pause_event, stop_event):
