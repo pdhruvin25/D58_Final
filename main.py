@@ -1,5 +1,4 @@
 import argparse
-import platform
 import threading
 
 import keyboard
@@ -11,13 +10,29 @@ from src.sniffer import Sniffer
 def main():
     parser = argparse.ArgumentParser(description="Packet Sniffer Tool")
     parser.add_argument('--filter', type=str, default=None,
-                        help="Apply a packet filter (e.g., 'tcp port 80')")
+                        help="Apply a BPF-style packet filter (e.g., 'tcp port 80')")
+    parser.add_argument('--src-ip', type=str, default=None,
+                        help="Filter packets by source IP address.")
+    parser.add_argument('--dest-ip', type=str, default=None,
+                        help="Filter packets by destination IP address.")
     args = parser.parse_args()
 
-    display = Display()
+    # Build filter rule with additional IP filters
+    filter_rule = args.filter
+    if args.src_ip:
+        filter_rule = f"{filter_rule} and src {args.src_ip}" if filter_rule else f"src {args.src_ip}"
+    if args.dest_ip:
+        filter_rule = f"{filter_rule} and dst {args.dest_ip}" if filter_rule else f"dst {args.dest_ip}"
 
-    os_type = platform.system().lower()
-    sniffer = Sniffer(filter_rule=args.filter)
+    # Collect filter options for display
+    filter_options = {
+        "Packet Filter": args.filter,
+        "Source IP": args.src_ip,
+        "Destination IP": args.dest_ip,
+    }
+
+    display = Display(filter_options=filter_options)
+    sniffer = Sniffer(filter_rule=filter_rule)
     display.show_banner()
 
     pause_event = threading.Event()
@@ -46,6 +61,7 @@ def main():
         display.show_statistics(sniffer.packet_stats)
         print("[INFO] Sniffer stopped.")
 
+
 def handle_user_input(pause_event, stop_event):
     print("[INFO] Press 'p' to pause, 'r' to resume, 'q' to quit.")
     while not stop_event.is_set():
@@ -66,6 +82,7 @@ def handle_user_input(pause_event, stop_event):
             stop_event.set()
             print("\n[INFO] KeyboardInterrupt detected. Exiting...")
             break
+
 
 if __name__ == "__main__":
     main()
