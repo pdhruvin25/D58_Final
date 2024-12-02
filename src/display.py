@@ -1,7 +1,10 @@
+import time
+from datetime import datetime
+
 from rich.console import Console
 from rich.table import Table
-from datetime import datetime
-import time
+from scapy.all import IP, TCP, UDP
+
 
 class Display:
     def __init__(self):
@@ -22,11 +25,10 @@ class Display:
             f.write(f"{'Source':<20}{'Destination':<20}{'Protocol':<10}{'Info'}\n")
             f.write("=" * 50 + "\n")
 
-    def save_to_file(self, src, dest, protocol, info, latency=None):
+    def save_to_file(self, src, dest, protocol, info):
         """Append packet details to the output file."""
         with open(self.output_file, "a") as f:
-            latency_str = f" | Latency: {latency:.6f}s" if latency else ""
-            f.write(f"{src:<20}{dest:<20}{protocol:<10}{info}{latency_str}\n")
+            f.write(f"{src:<20}{dest:<20}{protocol:<10}{info}\n")
 
     def show_statistics(self, stats):
         """Display overall packet statistics."""
@@ -46,43 +48,26 @@ class Display:
         table.add_column("Destination")
         table.add_column("Protocol")
         table.add_column("Info")
-        table.add_column("Latency")
 
-        src_ip = packet['IP'].src if packet.haslayer('IP') else 'N/A'
-        dest_ip = packet['IP'].dst if packet.haslayer('IP') else 'N/A'
+        src_ip = packet[IP].src if packet.haslayer(IP) else 'N/A'
+        dest_ip = packet[IP].dst if packet.haslayer(IP) else 'N/A'
 
-        if packet.haslayer('TCP'):
+        if packet.haslayer(TCP):
             protocol = 'TCP'
-            src_port = packet['TCP'].sport
-            dest_port = packet['TCP'].dport
-            payload = bytes(packet['TCP'].payload).decode('utf-8', errors='ignore')
-
-            if src_port == 80 or dest_port == 80:  # HTTP traffic
-                method = None
-                if payload.startswith(("GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS")):
-                    method = payload.split(" ")[0]
-                info = f"HTTP {method}" if method else "HTTP Traffic"
-            else:
-                info = f"{src_port} -> {dest_port}"
-        elif packet.haslayer('UDP'):
+            src_port = packet[TCP].sport
+            dest_port = packet[TCP].dport
+            info = f"{src_port} -> {dest_port}"
+        elif packet.haslayer(UDP):
             protocol = 'UDP'
-            src_port = packet['UDP'].sport
-            dest_port = packet['UDP'].dport
+            src_port = packet[UDP].sport
+            dest_port = packet[UDP].dport
             info = f"{src_port} -> {dest_port}"
         else:
             protocol = 'Other'
             info = packet.summary()
 
-        latency = getattr(packet, 'latency', 'N/A')
-        latency_str = f"{latency:.6f}s" if isinstance(latency, float) else latency
-
-        table.add_row(src_ip, dest_ip, protocol, info, latency_str)
+        table.add_row(src_ip, dest_ip, protocol, info)
         self.console.print(table)
 
         # Save to file
-        self.save_to_file(src_ip, dest_ip, protocol, info, latency if isinstance(latency, float) else None)
-
-        # Add delay before processing the next packet
-        time.sleep(0.1)  # Adjust the delay time as needed
-
-
+        self.save_to_file(src_ip, dest_ip, protocol, info)
