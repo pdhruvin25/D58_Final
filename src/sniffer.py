@@ -73,8 +73,8 @@ class Sniffer:
         Track timing for request-response pairs and calculate latency.
         """
         if packet.haslayer('TCP') or packet.haslayer('UDP'):
-            src = packet['IP'].src
-            dst = packet['IP'].dst
+            src = packet['IP'].src if packet.haslayer('IP') else packet['IPv6'].src
+            dst = packet['IP'].dst if packet.haslayer('IP') else packet['IPv6'].dst
             sport = packet['TCP'].sport if packet.haslayer('TCP') else packet['UDP'].sport
             dport = packet['TCP'].dport if packet.haslayer('TCP') else packet['UDP'].dport
 

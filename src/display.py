@@ -61,8 +61,15 @@ class Display:
         table.add_column("Info")
         table.add_column("Latency")
 
-        src_ip = packet[IP].src if packet.haslayer(IP) else 'N/A'
-        dest_ip = packet[IP].dst if packet.haslayer(IP) else 'N/A'
+        if packet.haslayer(IP):
+            src_ip = packet[IP].src
+            dest_ip = packet[IP].dst
+        elif packet.haslayer('IPv6'):
+            src_ip = packet['IPv6'].src
+            dest_ip = packet['IPv6'].dst
+        else:
+            src_ip = "N/A"
+            dest_ip = "N/A"
         latency = getattr(packet, 'latency', None)
 
         if packet.haslayer(TCP):
