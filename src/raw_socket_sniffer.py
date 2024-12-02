@@ -12,12 +12,11 @@ class RawSocketSniffer:
         self.sniffing = True
 
         if platform.system().lower() == 'windows':
-            # Windows setup (same as before)
-            pass  # Use the previous code for Windows setup
+            pass
         else:
             sock = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
 
-        sock.settimeout(1)  # Set timeout to 1 second
+        sock.settimeout(1)
 
         try:
             while not stop_event.is_set():
@@ -28,15 +27,13 @@ class RawSocketSniffer:
                         if parsed_packet:
                             packet_handler(parsed_packet)
                     except socket.timeout:
-                        pass  # No data received within timeout
+                        pass
                 else:
-                    # Paused, wait until pause_event is cleared or stop_event is set
                     pause_event.wait(1)
         except KeyboardInterrupt:
             print("\n[INFO] KeyboardInterrupt detected in sniffer thread.")
         finally:
             if platform.system().lower() == 'windows':
-                # Disable promiscuous mode
                 sock.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
             sock.close()
             self.sniffing = False

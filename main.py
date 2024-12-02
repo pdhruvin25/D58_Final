@@ -4,6 +4,8 @@ import platform
 from src.sniffer import Sniffer
 from src.raw_socket_sniffer import RawSocketSniffer
 from src.display import Display
+import keyboard
+
 
 def main():
     parser = argparse.ArgumentParser(description="Packet Sniffer Tool")
@@ -62,24 +64,21 @@ def handle_user_input(pause_event, stop_event):
     print("[INFO] Press 'p' to pause, 'r' to resume, 'q' to quit.")
     while not stop_event.is_set():
         try:
-            user_input = input()
-            if user_input.lower() == 'p':
+            if keyboard.is_pressed('p'):
                 if not pause_event.is_set():
                     pause_event.set()
                     print("[INFO] Sniffer paused.")
-            elif user_input.lower() == 'r':
+            elif keyboard.is_pressed('r'):
                 if pause_event.is_set():
                     pause_event.clear()
                     print("[INFO] Sniffer resumed.")
-            elif user_input.lower() == 'q':
+            elif keyboard.is_pressed('q'):
                 stop_event.set()
                 print("[INFO] Stopping sniffer...")
                 break
-            else:
-                print("[INFO] Invalid input. Press 'p' to pause, 'r' to resume, 'q' to quit.")
-        except EOFError:
-            # Handle end of input (e.g., when input stream is closed)
+        except KeyboardInterrupt:
             stop_event.set()
+            print("\n[INFO] KeyboardInterrupt detected. Exiting...")
             break
 
 if __name__ == "__main__":
