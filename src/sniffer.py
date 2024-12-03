@@ -83,10 +83,18 @@ class Sniffer:
 
             if check not in self.request_timestamps:
                 # If it's a request, store the timestamp and save details
-                self.request_timestamps[key] = time.time()
+                self.request_timestamps[key] = self.request_timestamps.get(key, []) + [time.time()]
+                print(self.request_timestamps[key])
+                
+                # Clean up old requests (assuming timeout after 2 seconds)
+                n = len(self.request_timestamps[key])
+                if self.request_timestamps[key][-1] - self.request_timestamps[key][n//2] > 2:
+                    self.request_timestamps[key] = self.request_timestamps[key][(n//2)+1:]
             else:
                 # If it's a response, calculate latency and update packet
-                request_time = self.request_timestamps.pop(check)
+                request_time = self.request_timestamps[check].pop(0)
+                if self.request_timestamps[check] == []:
+                    self.request_timestamps.pop(check)
                 response_time = time.time()
                 latency = response_time - request_time
                 packet.latency = latency
