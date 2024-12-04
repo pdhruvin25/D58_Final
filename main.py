@@ -9,11 +9,7 @@ from src.sniffer import Sniffer
 
 def main():
     # Show welcome message and instructions
-    print("Welcome to the Packet Sniffer Tool!")
-    print("Command usage:")
-    print("  --filter: Apply a BPF-style packet filter (e.g., 'tcp port 80')")
-    print("  --src-ip: Filter packets by source IP address.")
-    print("  --dest-ip: Filter packets by destination IP address.")
+    print("Welcome to Packet Sniffer Tool!")
     print("\nPress Enter to start the sniffer...")
 
     # Wait for the user to press Enter
