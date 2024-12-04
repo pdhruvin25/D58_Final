@@ -10,7 +10,8 @@ from src.sniffer import Sniffer
 def main():
     # Show welcome message and instructions
     print("Welcome to Packet Sniffer Tool!")
-    print("\nPress Enter to start the sniffer...")
+    print("Press 'p' to pause, 'r' to resume, 'q' to quit.")
+    print("Press Enter to start the sniffer...")
 
     # Wait for the user to press Enter
     input()
@@ -79,7 +80,6 @@ def main():
 
 # Handle user input to pause, resume, or stop the sniffer
 def handle_user_input(pause_event, stop_event):
-    print("[INFO] Press 'p' to pause, 'r' to resume, 'q' to quit.")
     while not stop_event.is_set():
         try:
             # Pause if 'p' is pressed

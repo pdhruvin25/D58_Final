@@ -29,18 +29,20 @@ class Display:
             f.write("=" * 60 + "\n")
             f.write("Active Filters:\n")
             for key, value in self.filter_options.items():
-                if value:  # Only include non-empty filter options
+                if value: 
                     f.write(f"  {key}: {value}\n")
             f.write("=" * 60 + "\n")
-            f.write(f"{'Source':<20}{'Destination':<20}{'Protocol':<10}{'Info':<30}{'Latency':<10}\n")
+            # Add a "Size" column here as well
+            f.write(f"{'Source':<20}{'Destination':<20}{'Protocol':<10}{'Size':<10}{'Info':<30}{'Latency':<10}\n")
             f.write("=" * 60 + "\n")
 
-    def save_to_file(self, src, dest, protocol, info, latency=None):
+    def save_to_file(self, src, dest, protocol, info, latency=None, size=None):
         """Append packet details to the output file."""
         latency_str = f"{latency:.6f}s" if latency else "N/A"
+        size_str = str(size) if size else "N/A"
         with open(self.output_file, "a") as f:
-            f.write(f"{src:<20}{dest:<20}{protocol:<10}{info:<30}{latency_str}\n")
-
+            # Include size in the output line
+            f.write(f"{src:<20}{dest:<20}{protocol:<10}{size_str:<10}{info:<30}{latency_str}\n")
     def show_statistics(self, stats):
         """Display overall packet statistics."""
         self.console.print("[bold green]Packet Statistics:[/bold green]")
@@ -52,14 +54,17 @@ class Display:
             table.add_row(protocol, str(count))
 
         self.console.print(table)
-
+    
     def process_packet(self, packet):
         table = Table(show_header=True, header_style="bold magenta")
         table.add_column("Source")
         table.add_column("Destination")
         table.add_column("Protocol")
+        table.add_column("Size")
         table.add_column("Info")
         table.add_column("Latency")
+
+        packet_length = len(packet)
 
         if packet.haslayer(IP):
             src_ip = packet[IP].src
@@ -87,8 +92,8 @@ class Display:
             info = packet.summary()
 
         latency_str = f"{latency:.6f}s" if latency else "N/A"
-        table.add_row(src_ip, dest_ip, protocol, info, latency_str)
+        table.add_row(src_ip, dest_ip, protocol, str(packet_length), info, latency_str)
         self.console.print(table)
 
-        # Save to file
-        self.save_to_file(src_ip, dest_ip, protocol, info, latency)
+        # Pass size to the file saving function
+        self.save_to_file(src_ip, dest_ip, protocol, info, latency, size=packet_length)

@@ -97,4 +97,3 @@ class Sniffer:
                 response_time = time.time()
                 latency = response_time - request_time
                 packet.latency = latency
-                print(f"[INFO] Latency: {latency:.6f} seconds for {key}")

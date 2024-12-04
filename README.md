@@ -12,7 +12,7 @@ The Packet Sniffer project is a lightweight and interactive command-line tool de
 ### Goals
 - Create a robust, user-friendly packet sniffer that supports customizable filters.
 - Provide real-time statistics and analysis of captured packets.
-- Offer users a detailed view of their network traffic while supporting advanced features like pausing, resuming, and stopping the capture.
+- Offer users a detailed view of their network traffic while supporting advanced features like pausing, resuming, and stopping the capture along with optional filtering.
 
 ---
 
@@ -38,15 +38,16 @@ The Packet Sniffer project is a lightweight and interactive command-line tool de
 - Use Python 3.8+.
 
   ```bash
-  pip install scapy rich keyboard
+  pip install -r ./requirements.txt
   ```
 ### 2. **Run the Program**:
-- Execute main.py with optional arguments for filters:
+- Execute main.py with optional arguments for filters (example):
   ```bash
-  python main.py --filter "tcp port 80" --src-ip "192.168.1.1" --dest-ip "192.168.1.2"
+  python ./main.py --filter "tcp port 80" --src-ip "192.168.1.1" --dest-ip "192.168.1.2"
   ```
 
 ### 3. **User Controls**:
+- Press Enter to start the sniffer.
 - Press p to pause the sniffer.
 - Press r to resume capturing packets.
 - Press q to quit the application.
@@ -87,9 +88,12 @@ The Packet Sniffer project is a lightweight and interactive command-line tool de
 
 ## Concluding Remarks and Lessons Learned
 
-The Packet Sniffer project taught us valuable lessons in threading, real-time processing, and visualization.
+The Packet Sniffer project taught us valuable lessons in threading, real-time processing, and visualization. By tackling these challenges, this project not only demonstrated the principles of modular software engineering but also provided practical experience in developing a sophisticated networking tool.
 
 ### Lessons Learned:
-- Design modular and maintainable code for scalability.
-- Optimize real-time packet processing and reduce latency.
-- Handle multi-threaded interactions for responsive user input.
+- Building the Packet Sniffer Tool shed light on the importance of designing modular and maintainable code. By breaking the application into distinct components such as Display and Sniffer, we created a structure that not only simplifies debugging but also facilitates the addition of new features. For instance, implementing additional filtering options or expanding the packet analysis functionality can be done with minimal disruption to the existing codebase. This modular design ensures the tool can evolve as networking requirements become more complex.
+- Developing the tool provided hands-on experience in handling low-level packet data. Reading raw network packets, parsing them into meaningful information, and presenting this data in a visually appealing format taught valuable skills in network protocol analysis. Implementing counters and statistics for packet types, sizes, and other attributes offered a deeper understanding of packet anatomy. It also emphasized the need for accuracy and clarity when processing and displaying technical data, as these features are crucial for a networking tool.
+- One of the most valuable lessons was managing multi-threaded interactions to provide a responsive user experience. By separating the packet capturing and user input handling into different threads, the application maintained real-time performance without blocking the main execution flow. This experience highlighted the challenges of thread synchronization, such as coordinating pause and resume functionality using threading events. Implementing a robust and responsive interaction model for users not only improved the tool’s usability but also demonstrated the power of concurrency in real-world applications.
+- The inclusion of Berkeley Packet Filter (BPF)-style syntax for dynamic packet filtering was an essential feature of the tool. Implementing this taught the significance of flexibility in filtering mechanisms, allowing users to refine their searches in real time using parameters like source IP, destination IP, or specific protocols (e.g., TCP/UDP). Integrating multiple filter rules seamlessly demonstrated the importance of combining user input validation with efficient backend logic to handle complex filtering scenarios.
+- Providing intuitive feedback to users, such as messages indicating the tool’s status (e.g., "Sniffer paused," "Resuming sniffer"), improved the user experience significantly. This feature ensured users were constantly aware of the tool’s state and could control its operation confidently. Balancing real-time feedback with minimal disruption to the core functionality was a practical lesson in the design.
+- Developing this tool deepened the understanding of fundamental networking concepts, such as packet capture mechanisms, protocol structures, and data transmission workflows. Parsing raw packet data offered hands-on exposure to protocols like TCP, UDP, and ICMP, while designing filters emphasized the importance of control in network traffic analysis. These lessons are invaluable for diagnosing and resolving networking issues in real life scenarios.
