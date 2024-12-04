@@ -8,6 +8,17 @@ from src.sniffer import Sniffer
 
 
 def main():
+    # Show welcome message and instructions
+    print("Welcome to the Packet Sniffer Tool!")
+    print("Command usage:")
+    print("  --filter: Apply a BPF-style packet filter (e.g., 'tcp port 80')")
+    print("  --src-ip: Filter packets by source IP address.")
+    print("  --dest-ip: Filter packets by destination IP address.")
+    print("\nPress Enter to start the sniffer...")
+
+    # Wait for the user to press Enter
+    input()
+
     # Handle command line arguments
     parser = argparse.ArgumentParser(description="Packet Sniffer Tool")
     parser.add_argument('--filter', type=str, default=None,
@@ -68,6 +79,7 @@ def main():
         input_thread.join()
         display.show_statistics(sniffer.packet_stats)
         print("[INFO] Sniffer stopped.")
+
 
 # Handle user input to pause, resume, or stop the sniffer
 def handle_user_input(pause_event, stop_event):
