@@ -84,7 +84,6 @@ class Sniffer:
             if check not in self.request_timestamps:
                 # If it's a request, store the timestamp and save details
                 self.request_timestamps[key] = self.request_timestamps.get(key, []) + [time.time()]
-                print(self.request_timestamps[key])
                 
                 # Clean up old requests (assuming timeout after 2 seconds)
                 n = len(self.request_timestamps[key])
