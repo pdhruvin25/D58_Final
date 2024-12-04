@@ -10,11 +10,8 @@ from src.sniffer import Sniffer
 def main():
     # Show welcome message and instructions
     print("Welcome to Packet Sniffer Tool!")
-    print("Press 'p' to pause, 'r' to resume, 'q' to quit.")
-    print("Press Enter to start the sniffer...")
 
     # Wait for the user to press Enter
-    input()
 
     # Handle command line arguments
     parser = argparse.ArgumentParser(description="Packet Sniffer Tool")
@@ -26,6 +23,9 @@ def main():
                         help="Filter packets by destination IP address.")
     args = parser.parse_args()
 
+    print("Press 'p' to pause, 'r' to resume, 'q' to quit.")
+    print("Press Enter to start the sniffer...")
+    input()
     # Build filter rule with additional IP filters
     filter_rule = args.filter
     if args.src_ip:
