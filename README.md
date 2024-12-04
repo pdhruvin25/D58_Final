@@ -10,7 +10,7 @@ The final project of CSCD58
 The Packet Sniffer project is a lightweight and interactive command-line tool designed to monitor network traffic in real time. It leverages the Scapy library to capture and analyze network packets, providing detailed insights into traffic patterns, protocol usage, and request-response latencies. 
 
 ### Goals
-- Create a robust, user-friendly packet sniffer that supports customizable filters.
+- Create a packet sniffer that supports customizable filters.
 - Provide real-time statistics and analysis of captured packets.
 - Offer users a detailed view of their network traffic while supporting advanced features like pausing, resuming, and stopping the capture along with optional filtering.
 
@@ -58,7 +58,7 @@ The Packet Sniffer project is a lightweight and interactive command-line tool de
 ## Implementation Details and Documentation
 
 ### 1. Main Script (main.py):
-- Handles user inputs, manages threading, and orchestrates the sniffer and display components.
+- Handles user inputs, manages threading, and handles the sniffer and display components.
 
 ### 2. Sniffer Module (sniffer.py):
 - Captures packets using Scapy's AsyncSniffer.
@@ -75,16 +75,16 @@ The Packet Sniffer project is a lightweight and interactive command-line tool de
 
 - Strengths:
   - Real-time packet capturing with customizable filters enhances usability.
-  - Integrated latency tracking for performance analysis.
-  - Rich visualizations for improved user interaction.
+  - Integrated latency tracking for performance analysis along with pakcet size.
+  - Rich visualizations for improved user interaction including a pause, resume and stop feature.
 
 - Limitations:
-  - Relies on Scapy, which might not be optimal for high-performance networks.
+  - Relies on Scapy, which might not be optimal for complex networks.
   - Limited IPv6 support in packet tracking.
 
 - Potential Enhancements:
   - Add support for saving output in JSON/CSV format for advanced analysis.
-  - Implement GUI-based visualization.
+  - Implement GUI visualization.
 
 ## Concluding Remarks and Lessons Learned
 
